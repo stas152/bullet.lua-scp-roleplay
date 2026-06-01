@@ -128,46 +128,10 @@ local function setGlobalColor(newCol)
     end
 end
 
-local function getAuras()
-    local f = getFolder()
-    local t = {}
-    if f then
-        for _, c in ipairs(f:GetChildren()) do
-            table.insert(t, c.Name)
-        end
-    end
-    return t
-end
-
 getModel(modelId)
 
-local auTg = LPlrS:AddLabel('Aura Manager')
-auTg:AddToggle({Default = false, Callback = function(v)
-    if not v then
-        for name, _ in pairs(act) do
-            unequip(name)
-        end
-    end
-end})
-
-local auOpt = auTg:AddOption()
-auOpt:AddLabel('Aura Color'):AddColorPicker({Default = col, Callback = function(v)
-    setGlobalColor(v)
-end})
-
-auOpt:AddLabel('Select Auras'):AddDropdown({
-    Default = {},
-    Multi = true,
-    Values = getAuras(),
-    Callback = function(v)
-        for name, selected in pairs(v) do
-            if selected then
-                equip(name)
-            else
-                unequip(name)
-            end
-        end
-    end
-end})
-
-print("Aura Manager integrated successfully.")
+getgenv().EffectManager = {
+    Equip = equip,
+    Unequip = unequip,
+    SetColor = setGlobalColor
+}
