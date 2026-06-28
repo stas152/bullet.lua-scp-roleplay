@@ -7,6 +7,30 @@ local modelId = 124505658459350
 local act = {}
 local col = Color3.fromRGB(96, 205, 255)
 
+local cosmicModel = nil
+
+local function loadCosmicAsset()
+    local u = "https://raw.githubusercontent.com/stas152/bullet.lua-scp-roleplay/main/CosmicAura.txt.rbxmx"
+    local f = "CosmicAura.rbxmx"
+    
+    if not isfile(f) then
+        pcall(function()
+            writefile(f, game:HttpGet(u))
+        end)
+    end
+
+    if isfile(f) then
+        local success, res = pcall(function()
+            return game:GetObjects(getcustomasset(f))[1]
+        end)
+        if success and res then
+            cosmicModel = res
+        end
+    end
+end
+
+task.spawn(loadCosmicAsset)
+
 local function getModel(id)
     local ok, res = pcall(game.GetObjects, game, "rbxassetid://" .. id)
     if ok and res and res[1] then
@@ -61,10 +85,12 @@ end
 
 local function unequip(name)
     if act[name] then
-        for _, att in ipairs(act[name]) do
-            if att and att.Parent then
-                att:Destroy()
-            end
+        for _, obj in ipairs(act[name]) do
+            pcall(function()
+                if obj and obj.Parent then
+                    obj:Destroy()
+                end
+            end)
         end
         act[name] = nil
     end
@@ -76,14 +102,76 @@ local function equip(name)
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
     
+    unequip(name)
+    act[name] = {}
+    
+    -- Обработка Cosmic VFX
+    if name:lower() == "cosmic" then
+        if not cosmicModel then
+            loadCosmicAsset()
+            local timeout = 0
+            while not cosmicModel and timeout < 5 do
+                task.wait(0.5)
+                timeout = timeout + 0.5
+            end
+        end
+        
+        if not cosmicModel then return end
+        
+        local function setup(obj)
+            local cloned = obj:Clone()
+            if cloned:IsA("Attachment") then
+                cloned.Parent = hrp
+                for _, e in ipairs(cloned:GetDescendants()) do
+                    if e:IsA("ParticleEmitter") then e.Enabled = true end
+                end
+                table.insert(act[name], cloned)
+            elseif cloned:IsA("ParticleEmitter") or cloned:IsA("Beam") or cloned:IsA("Trail") or cloned:IsA("Light") then
+                cloned.Parent = hrp
+                if cloned:IsA("ParticleEmitter") then cloned.Enabled = true end
+                table.insert(act[name], cloned)
+            elseif cloned:IsA("BasePart") then
+                cloned.Parent = char
+                cloned.CanCollide = false
+                cloned.Anchored = false
+                cloned.CFrame = hrp.CFrame
+                local w = Instance.new("WeldConstraint")
+                w.Part0 = hrp
+                w.Part1 = cloned
+                w.Parent = hrp
+                for _, e in ipairs(cloned:GetDescendants()) do
+                    if e:IsA("ParticleEmitter") then e.Enabled = true end
+                end
+                table.insert(act[name], cloned)
+                table.insert(act[name], w)
+            end
+        end
+        
+        if cosmicModel:IsA("Model") or cosmicModel:IsA("Folder") then
+            for _, child in ipairs(cosmicModel:GetChildren()) do
+                setup(child)
+            end
+        else
+            setup(cosmicModel)
+        end
+
+        for _, obj in ipairs(act[name]) do
+            if obj:IsA("Attachment") or obj:IsA("BasePart") then
+                updateColor(obj, col)
+            elseif obj:IsA("ParticleEmitter") or obj:IsA("Beam") or obj:IsA("Trail") then
+                obj.Color = ColorSequence.new(col)
+            elseif obj:IsA("Light") then
+                obj.Color = col
+            end
+        end
+        return
+    end
+
     local f = getFolder()
     if not f then return end
     
     local item = f:FindFirstChild(name, true)
     if not item then return end
-    
-    unequip(name)
-    act[name] = {}
     
     local targetName = "Torso"
     if name:lower():find("halo") or name:lower():find("head") then
@@ -123,7 +211,13 @@ local function setGlobalColor(newCol)
     col = newCol
     for _, atts in pairs(act) do
         for _, att in ipairs(atts) do
-            updateColor(att, col)
+            if att:IsA("Attachment") or att:IsA("BasePart") then
+                updateColor(att, col)
+            elseif att:IsA("ParticleEmitter") or att:IsA("Beam") or att:IsA("Trail") then
+                att.Color = ColorSequence.new(col)
+            elseif att:IsA("Light") then
+                att.Color = col
+            end
         end
     end
 end
