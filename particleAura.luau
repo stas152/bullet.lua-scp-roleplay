@@ -6,19 +6,16 @@ local lp = pl.LocalPlayer
 local mi = 124505658459350
 local ac = {}
 local co = Color3.fromRGB(96, 205, 255)
-
 local cm = nil
 
 local function lc()
     local u = "https://raw.githubusercontent.com/stas152/bullet.lua-scp-roleplay/main/CosmicAura.txt.rbxmx"
     local f = "CosmicAura.rbxmx"
-    
     if not isfile(f) then
         pcall(function()
             writefile(f, game:HttpGet(u))
         end)
     end
-
     if isfile(f) then
         local s, r = pcall(function()
             return game:GetObjects(getcustomasset(f))[1]
@@ -31,23 +28,41 @@ end
 
 task.spawn(lc)
 
-local function gm(id)
-    local ok, res = pcall(game.GetObjects, game, "rbxassetid://" .. id)
-    if ok and res and res[1] then
-        local m = res[1]
-        m.Parent = ws
-        local far = Vector3.new(999999, 999999, 999999)
-        if m:IsA("Model") then
-            m:MoveTo(far)
-        elseif m:IsA("BasePart") then
-            m.Position = far
-        end
-        return m
+local function gf()
+    local f = ws:FindFirstChild("niggasploit")
+    if not f then
+        f = Instance.new("Folder")
+        f.Name = "niggasploit"
+        f.Parent = ws
     end
+    return f
 end
 
-local function gf()
-    return ws:FindFirstChild("Folder")
+local function gm(id)
+    local o, r = pcall(game.GetObjects, game, "rbxassetid://" .. id)
+    if o and r and r[1] then
+        local m = r[1]
+        local f = gf()
+        local v = Vector3.new(999999, 999999, 999999)
+        if m:IsA("Folder") or m:IsA("Model") then
+            for _, c in ipairs(m:GetChildren()) do
+                c.Parent = f
+                if c:IsA("Model") then
+                    c:MoveTo(v)
+                elseif c:IsA("BasePart") then
+                    c.Position = v
+                end
+            end
+            m:Destroy()
+        else
+            m.Parent = f
+            if m:IsA("Model") then
+                m:MoveTo(v)
+            elseif m:IsA("BasePart") then
+                m.Position = v
+            end
+        end
+    end
 end
 
 local function gr(c)
@@ -113,7 +128,6 @@ local function eq(n)
                 t = t + 0.5
             end
         end
-        
         if not cm then return end
         
         local function s(o)
@@ -183,16 +197,13 @@ local function eq(n)
                 p = gp(c, d.Parent.Name)
             end
             p = p or h
-            
             if p then
                 local an = d.Name .. "_" .. n .. "_Custom"
                 local at = p:FindFirstChild(an) or Instance.new("Attachment")
                 at.Name = an
                 at.CFrame = d.CFrame
                 at.Parent = p
-                
                 table.insert(ac[n], at)
-                
                 for _, ef in ipairs(d:GetChildren()) do
                     if ef:IsA("ParticleEmitter") or ef:IsA("Beam") or ef:IsA("Trail") or ef:IsA("Light") or ef:IsA("Fire") or ef:IsA("Smoke") or ef:IsA("Sparkles") then
                         local cl = ef:Clone()
