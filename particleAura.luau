@@ -18,35 +18,33 @@ local function gf()
     return f
 end
 
+local function oa(a)
+    if a:IsA("Attachment") then
+        a.Position = Vector3.new(0, 99999, 0)
+    end
+end
+
+local f = gf()
+f.DescendantAdded:Connect(oa)
+
 local function lc()
     local u = "https://raw.githubusercontent.com/stas152/bullet.lua-scp-roleplay/main/CosmicAura.txt.rbxmx"
-    local f = "CosmicAura.rbxmx"
-    if not isfile(f) then
+    local f_name = "CosmicAura.rbxmx"
+    if not isfile(f_name) then
         pcall(function()
-            writefile(f, game:HttpGet(u))
+            writefile(f_name, game:HttpGet(u))
         end)
     end
-    if isfile(f) then
+    if isfile(f_name) then
         local s, r = pcall(function()
-            return game:GetObjects(getcustomasset(f))[1]
+            return game:GetObjects(getcustomasset(f_name))[1]
         end)
         if s and r then
-            local d = gf():FindFirstChild("Cosmic")
+            local d = f:FindFirstChild("Cosmic")
             if d then d:Destroy() end
             cm = r
             cm.Name = "Cosmic"
-            cm.Parent = gf()
-            local v = Vector3.new(0.142, 9999999, 0)
-            if cm:IsA("Model") then
-                cm:MoveTo(v)
-            elseif cm:IsA("BasePart") then
-                cm.Position = v
-            end
-            for _, c in ipairs(cm:GetDescendants()) do
-                if c:IsA("BasePart") then
-                    c.Position = v
-                end
-            end
+            cm.Parent = f
         end
     end
 end
@@ -57,25 +55,13 @@ local function gm(id)
     local o, r = pcall(game.GetObjects, game, "rbxassetid://" .. id)
     if o and r and r[1] then
         local m = r[1]
-        local f = gf()
-        local v = Vector3.new(0.142, 9999999, 0)
         if m:IsA("Folder") or m:IsA("Model") then
             for _, c in ipairs(m:GetChildren()) do
                 c.Parent = f
-                if c:IsA("Model") then
-                    c:MoveTo(v)
-                elseif c:IsA("BasePart") then
-                    c.Position = v
-                end
             end
             m:Destroy()
         else
             m.Parent = f
-            if m:IsA("Model") then
-                m:MoveTo(v)
-            elseif m:IsA("BasePart") then
-                m.Position = v
-            end
         end
     end
 end
@@ -145,7 +131,6 @@ local function eq(n)
         local function s(o)
             local cl = o:Clone()
             if cl:IsA("Attachment") then
-                cl.CFrame = cl.CFrame + Vector3.new(0, 10000, 0)
                 cl.Parent = h
                 for _, e in ipairs(cl:GetDescendants()) do
                     if e:IsA("ParticleEmitter") then e.Enabled = true end
@@ -159,7 +144,7 @@ local function eq(n)
                 cl.Parent = c
                 cl.CanCollide = false
                 cl.Anchored = false
-                cl.CFrame = h.CFrame + Vector3.new(0, 10000, 0)
+                cl.CFrame = h.CFrame
                 local w = Instance.new("WeldConstraint")
                 w.Part0 = h
                 w.Part1 = cl
@@ -189,8 +174,6 @@ local function eq(n)
         end
         return
     end
-    local f = gf()
-    if not f then return end
     local i = f:FindFirstChild(n, true)
     if not i then return end
     local tn = "Torso"
@@ -208,7 +191,7 @@ local function eq(n)
                 local an = d.Name .. "_" .. n .. "_Custom"
                 local at = p:FindFirstChild(an) or Instance.new("Attachment")
                 at.Name = an
-                at.CFrame = d.CFrame + Vector3.new(0, 10000, 0)
+                at.CFrame = d.CFrame
                 at.Parent = p
                 table.insert(ac[n], at)
                 for _, ef in ipairs(d:GetChildren()) do
@@ -238,15 +221,17 @@ local function sc(nc)
     end
 end
 
+for _, d in ipairs(f:GetDescendants()) do
+    oa(d)
+end
+
 gm(mi)
 
 task.spawn(function()
-    local f = gf()
     while not f do
         task.wait(1)
-        f = gf()
     end
-    if f and not f:FindFirstChild("Cosmic") then
+    if not f:FindFirstChild("Cosmic") then
         local d = Instance.new("Folder")
         d.Name = "Cosmic"
         d.Parent = f
