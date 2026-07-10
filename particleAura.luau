@@ -1,50 +1,30 @@
 local cr = cloneref or function(o) return o end
-local p = cr(game:GetService("Players"))
-local w = cr(game:GetService("Workspace"))
-local l = p.LocalPlayer
+local pl = cr(game:GetService("Players"))
+local ws = cr(game:GetService("Workspace"))
+local lp = pl.LocalPlayer
 
 local mi = 124505658459350
 local ac = {}
 local co = Color3.fromRGB(96, 205, 255)
+
 local cm = nil
-
-local function gf()
-    local o = w:FindFirstChild("Folder")
-    if not o then
-        o = Instance.new("Folder")
-        o.Name = "Folder"
-        o.Parent = w
-    end
-    return o
-end
-
-local function oa(a)
-    if a:IsA("Attachment") then
-        a.Position = Vector3.new(0, 99999, 0)
-    end
-end
-
-local f = gf()
-f.DescendantAdded:Connect(oa)
 
 local function lc()
     local u = "https://raw.githubusercontent.com/stas152/bullet.lua-scp-roleplay/main/CosmicAura.txt.rbxmx"
-    local n = "CosmicAura.rbxmx"
-    if not isfile(n) then
+    local f = "CosmicAura.rbxmx"
+    
+    if not isfile(f) then
         pcall(function()
-            writefile(n, game:HttpGet(u))
+            writefile(f, game:HttpGet(u))
         end)
     end
-    if isfile(n) then
+
+    if isfile(f) then
         local s, r = pcall(function()
-            return game:GetObjects(getcustomasset(n))[1]
+            return game:GetObjects(getcustomasset(f))[1]
         end)
         if s and r then
-            local d = f:FindFirstChild("Cosmic")
-            if d then d:Destroy() end
             cm = r
-            cm.Name = "Cosmic"
-            cm.Parent = f
         end
     end
 end
@@ -52,18 +32,22 @@ end
 task.spawn(lc)
 
 local function gm(id)
-    local s, r = pcall(game.GetObjects, game, "rbxassetid://" .. id)
-    if s and r and r[1] then
-        local m = r[1]
-        if m:IsA("Folder") or m:IsA("Model") then
-            for _, c in ipairs(m:GetChildren()) do
-                c.Parent = f
-            end
-            m:Destroy()
-        else
-            m.Parent = f
+    local ok, res = pcall(game.GetObjects, game, "rbxassetid://" .. id)
+    if ok and res and res[1] then
+        local m = res[1]
+        m.Parent = ws
+        local far = Vector3.new(999999, 999999, 999999)
+        if m:IsA("Model") then
+            m:MoveTo(far)
+        elseif m:IsA("BasePart") then
+            m.Position = far
         end
+        return m
     end
+end
+
+local function gf()
+    return ws:FindFirstChild("Folder")
 end
 
 local function gr(c)
@@ -112,12 +96,14 @@ local function un(n)
 end
 
 local function eq(n)
-    local c = l.Character
+    local c = lp.Character
     if not c then return end
     local h = c:FindFirstChild("HumanoidRootPart")
     if not h then return end
+    
     un(n)
     ac[n] = {}
+    
     if n:lower() == "cosmic" then
         if not cm then
             lc()
@@ -127,7 +113,9 @@ local function eq(n)
                 t = t + 0.5
             end
         end
+        
         if not cm then return end
+        
         local function s(o)
             local cl = o:Clone()
             if cl:IsA("Attachment") then
@@ -156,6 +144,7 @@ local function eq(n)
                 table.insert(ac[n], w)
             end
         end
+        
         if cm:IsA("Model") or cm:IsA("Folder") then
             for _, ch in ipairs(cm:GetChildren()) do
                 s(ch)
@@ -163,6 +152,7 @@ local function eq(n)
         else
             s(cm)
         end
+
         for _, o in ipairs(ac[n]) do
             if o:IsA("Attachment") or o:IsA("BasePart") then
                 uc(o, co)
@@ -174,26 +164,35 @@ local function eq(n)
         end
         return
     end
+
+    local f = gf()
+    if not f then return end
+    
     local i = f:FindFirstChild(n, true)
     if not i then return end
+    
     local tn = "Torso"
     if n:lower():find("halo") or n:lower():find("head") then
         tn = "Head"
     end
+    
     for _, d in ipairs(i:GetDescendants()) do
         if d:IsA("Attachment") then
-            local p_pt = gp(c, tn)
-            if not p_pt and d.Parent:IsA("BasePart") then
-                p_pt = gp(c, d.Parent.Name)
+            local p = gp(c, tn)
+            if not p and d.Parent:IsA("BasePart") then
+                p = gp(c, d.Parent.Name)
             end
-            p_pt = p_pt or h
-            if p_pt then
+            p = p or h
+            
+            if p then
                 local an = d.Name .. "_" .. n .. "_Custom"
-                local at = p_pt:FindFirstChild(an) or Instance.new("Attachment")
+                local at = p:FindFirstChild(an) or Instance.new("Attachment")
                 at.Name = an
                 at.CFrame = d.CFrame
-                at.Parent = p_pt
+                at.Parent = p
+                
                 table.insert(ac[n], at)
+                
                 for _, ef in ipairs(d:GetChildren()) do
                     if ef:IsA("ParticleEmitter") or ef:IsA("Beam") or ef:IsA("Trail") or ef:IsA("Light") or ef:IsA("Fire") or ef:IsA("Smoke") or ef:IsA("Sparkles") then
                         local cl = ef:Clone()
@@ -221,17 +220,15 @@ local function sc(nc)
     end
 end
 
-for _, d in ipairs(f:GetDescendants()) do
-    oa(d)
-end
-
 gm(mi)
 
 task.spawn(function()
+    local f = gf()
     while not f do
         task.wait(1)
+        f = gf()
     end
-    if not f:FindFirstChild("Cosmic") then
+    if f and not f:FindFirstChild("Cosmic") then
         local d = Instance.new("Folder")
         d.Name = "Cosmic"
         d.Parent = f
