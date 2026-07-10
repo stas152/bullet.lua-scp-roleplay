@@ -36,17 +36,6 @@ local function lc()
             cm = r
             cm.Name = "Cosmic"
             cm.Parent = gf()
-            local v = Vector3.new(999999, 9999999, 999999)
-            if cm:IsA("Model") then
-                cm:MoveTo(v)
-            elseif cm:IsA("BasePart") then
-                cm.Position = v
-            end
-            for _, c in ipairs(cm:GetDescendants()) do
-                if c:IsA("BasePart") then
-                    c.Position = v
-                end
-            end
         end
     end
 end
@@ -58,24 +47,13 @@ local function gm(id)
     if o and r and r[1] then
         local m = r[1]
         local f = gf()
-        local v = Vector3.new(999999, 9999999, 999999)
         if m:IsA("Folder") or m:IsA("Model") then
             for _, c in ipairs(m:GetChildren()) do
                 c.Parent = f
-                if c:IsA("Model") then
-                    c:MoveTo(v)
-                elseif c:IsA("BasePart") then
-                    c.Position = v
-                end
             end
             m:Destroy()
         else
             m.Parent = f
-            if m:IsA("Model") then
-                m:MoveTo(v)
-            elseif m:IsA("BasePart") then
-                m.Position = v
-            end
         end
     end
 end
@@ -145,6 +123,7 @@ local function eq(n)
         local function s(o)
             local cl = o:Clone()
             if cl:IsA("Attachment") then
+                cl.CFrame = cl.CFrame + Vector3.new(0, 10000, 0)
                 cl.Parent = h
                 for _, e in ipairs(cl:GetDescendants()) do
                     if e:IsA("ParticleEmitter") then e.Enabled = true end
@@ -158,7 +137,7 @@ local function eq(n)
                 cl.Parent = c
                 cl.CanCollide = false
                 cl.Anchored = false
-                cl.CFrame = h.CFrame
+                cl.CFrame = h.CFrame + Vector3.new(0, 10000, 0)
                 local w = Instance.new("WeldConstraint")
                 w.Part0 = h
                 w.Part1 = cl
@@ -207,7 +186,7 @@ local function eq(n)
                 local an = d.Name .. "_" .. n .. "_Custom"
                 local at = p:FindFirstChild(an) or Instance.new("Attachment")
                 at.Name = an
-                at.CFrame = d.CFrame
+                at.CFrame = d.CFrame + Vector3.new(0, 10000, 0)
                 at.Parent = p
                 table.insert(ac[n], at)
                 for _, ef in ipairs(d:GetChildren()) do
