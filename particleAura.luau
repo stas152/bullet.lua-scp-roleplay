@@ -36,7 +36,7 @@ local function lc()
             cm = r
             cm.Name = "Cosmic"
             cm.Parent = gf()
-            local v = Vector3.new(999999, 999999, 999999)
+            local v = Vector3.new(999999, 9999999, 999999)
             if cm:IsA("Model") then
                 cm:MoveTo(v)
             elseif cm:IsA("BasePart") then
@@ -58,7 +58,7 @@ local function gm(id)
     if o and r and r[1] then
         local m = r[1]
         local f = gf()
-        local v = Vector3.new(999999, 999999, 999999)
+        local v = Vector3.new(999999, 9999999, 999999)
         if m:IsA("Folder") or m:IsA("Model") then
             for _, c in ipairs(m:GetChildren()) do
                 c.Parent = f
