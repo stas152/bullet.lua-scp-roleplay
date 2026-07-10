@@ -8,6 +8,16 @@ local ac = {}
 local co = Color3.fromRGB(96, 205, 255)
 local cm = nil
 
+local function gf()
+    local f = ws:FindFirstChild("niggasploit")
+    if not f then
+        f = Instance.new("Folder")
+        f.Name = "niggasploit"
+        f.Parent = ws
+    end
+    return f
+end
+
 local function lc()
     local u = "https://raw.githubusercontent.com/stas152/bullet.lua-scp-roleplay/main/CosmicAura.txt.rbxmx"
     local f = "CosmicAura.rbxmx"
@@ -21,22 +31,27 @@ local function lc()
             return game:GetObjects(getcustomasset(f))[1]
         end)
         if s and r then
+            local d = gf():FindFirstChild("Cosmic")
+            if d then d:Destroy() end
             cm = r
+            cm.Name = "Cosmic"
+            cm.Parent = gf()
+            local v = Vector3.new(999999, 999999, 999999)
+            if cm:IsA("Model") then
+                cm:MoveTo(v)
+            elseif cm:IsA("BasePart") then
+                cm.Position = v
+            end
+            for _, c in ipairs(cm:GetDescendants()) do
+                if c:IsA("BasePart") then
+                    c.Position = v
+                end
+            end
         end
     end
 end
 
 task.spawn(lc)
-
-local function gf()
-    local f = ws:FindFirstChild("niggasploit")
-    if not f then
-        f = Instance.new("Folder")
-        f.Name = "niggasploit"
-        f.Parent = ws
-    end
-    return f
-end
 
 local function gm(id)
     local o, r = pcall(game.GetObjects, game, "rbxassetid://" .. id)
@@ -115,10 +130,8 @@ local function eq(n)
     if not c then return end
     local h = c:FindFirstChild("HumanoidRootPart")
     if not h then return end
-    
     un(n)
     ac[n] = {}
-    
     if n:lower() == "cosmic" then
         if not cm then
             lc()
@@ -129,7 +142,6 @@ local function eq(n)
             end
         end
         if not cm then return end
-        
         local function s(o)
             local cl = o:Clone()
             if cl:IsA("Attachment") then
@@ -158,7 +170,6 @@ local function eq(n)
                 table.insert(ac[n], w)
             end
         end
-        
         if cm:IsA("Model") or cm:IsA("Folder") then
             for _, ch in ipairs(cm:GetChildren()) do
                 s(ch)
@@ -166,7 +177,6 @@ local function eq(n)
         else
             s(cm)
         end
-
         for _, o in ipairs(ac[n]) do
             if o:IsA("Attachment") or o:IsA("BasePart") then
                 uc(o, co)
@@ -178,18 +188,14 @@ local function eq(n)
         end
         return
     end
-
     local f = gf()
     if not f then return end
-    
     local i = f:FindFirstChild(n, true)
     if not i then return end
-    
     local tn = "Torso"
     if n:lower():find("halo") or n:lower():find("head") then
         tn = "Head"
     end
-    
     for _, d in ipairs(i:GetDescendants()) do
         if d:IsA("Attachment") then
             local p = gp(c, tn)
