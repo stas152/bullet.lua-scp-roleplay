@@ -31,7 +31,14 @@ local function lc()
 end
 
 local function lna()
-    lf("https://raw.githubusercontent.com/stas152/bullet.lua-scp-roleplay/main/aura900.rbxm", "aura900.rbxm", function(r) na = r end)
+    lf("https://raw.githubusercontent.com/stas152/bullet.lua-scp-roleplay/main/aura900.rbxm", "aura900.rbxm", function(r) 
+        na = r 
+        for _, o in ipairs(na:GetDescendants()) do
+            if o.Name:lower():find("glare") and (o:IsA("ParticleEmitter") or o:IsA("Beam") or o:IsA("Trail") or o:IsA("Light") or o:IsA("Fire") or o:IsA("Smoke") or o:IsA("Sparkles")) then
+                o:Destroy()
+            end
+        end
+    end)
 end
 
 task.spawn(lc)
@@ -178,7 +185,7 @@ local function eq(n)
         if not na then return end
         
         for _, d in ipairs(na:GetDescendants()) do
-            if d:IsA("Attachment") and not d.Name:lower():find("glare") then
+            if d:IsA("Attachment") then
                 local p = gp(c, "Torso")
                 if d.Parent:IsA("BasePart") then
                     p = gp(c, d.Parent.Name) or p
@@ -195,17 +202,12 @@ local function eq(n)
                     table.insert(ac[n], at)
                     
                     for _, ef in ipairs(d:GetChildren()) do
-                        if not ef.Name:lower():find("glare") and (ef:IsA("ParticleEmitter") or ef:IsA("Beam") or ef:IsA("Trail") or ef:IsA("Light") or ef:IsA("Fire") or ef:IsA("Smoke") or ef:IsA("Sparkles")) then
+                        if ef:IsA("ParticleEmitter") or ef:IsA("Beam") or ef:IsA("Trail") or ef:IsA("Light") or ef:IsA("Fire") or ef:IsA("Smoke") or ef:IsA("Sparkles") then
                             local cl = ef:Clone()
                             if cl:IsA("ParticleEmitter") then
                                 cl.Enabled = true
                             end
                             cl.Parent = at
-                            for _, sub in ipairs(cl:GetDescendants()) do
-                                if sub.Name:lower():find("glare") then
-                                    sub:Destroy()
-                                end
-                            end
                         end
                     end
                     uc(at, co)
