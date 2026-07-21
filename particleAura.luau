@@ -178,7 +178,7 @@ local function eq(n)
         if not na then return end
         
         for _, d in ipairs(na:GetDescendants()) do
-            if d:IsA("Attachment") then
+            if d:IsA("Attachment") and not d.Name:lower():find("glare") then
                 local p = gp(c, "Torso")
                 if d.Parent:IsA("BasePart") then
                     p = gp(c, d.Parent.Name) or p
@@ -195,12 +195,17 @@ local function eq(n)
                     table.insert(ac[n], at)
                     
                     for _, ef in ipairs(d:GetChildren()) do
-                        if ef:IsA("ParticleEmitter") or ef:IsA("Beam") or ef:IsA("Trail") or ef:IsA("Light") or ef:IsA("Fire") or ef:IsA("Smoke") or ef:IsA("Sparkles") then
+                        if not ef.Name:lower():find("glare") and (ef:IsA("ParticleEmitter") or ef:IsA("Beam") or ef:IsA("Trail") or ef:IsA("Light") or ef:IsA("Fire") or ef:IsA("Smoke") or ef:IsA("Sparkles")) then
                             local cl = ef:Clone()
                             if cl:IsA("ParticleEmitter") then
                                 cl.Enabled = true
                             end
                             cl.Parent = at
+                            for _, sub in ipairs(cl:GetDescendants()) do
+                                if sub.Name:lower():find("glare") then
+                                    sub:Destroy()
+                                end
+                            end
                         end
                     end
                     uc(at, co)
