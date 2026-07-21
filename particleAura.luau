@@ -114,9 +114,6 @@ local function eq(n)
     un(n)
     ac[n] = {}
     
-    local custom = false
-    local target = nil
-    
     if n:lower() == "cosmic" then
         if not cm then
             lc()
@@ -126,23 +123,7 @@ local function eq(n)
                 t = t + 0.5
             end
         end
-        target = cm
-        custom = true
-    elseif n:lower() == "newaura" then
-        if not na then
-            lna()
-            local t = 0
-            while not na and t < 5 do
-                task.wait(0.5)
-                t = t + 0.5
-            end
-        end
-        target = na
-        custom = true
-    end
-    
-    if custom then
-        if not target then return end
+        if not cm then return end
         
         local function s(o)
             local cl = o:Clone()
@@ -173,16 +154,58 @@ local function eq(n)
             end
         end
         
-        if target:IsA("Model") or target:IsA("Folder") then
-            for _, ch in ipairs(target:GetChildren()) do
+        if cm:IsA("Model") or cm:IsA("Folder") then
+            for _, ch in ipairs(cm:GetChildren()) do
                 s(ch)
             end
         else
-            s(target)
+            s(cm)
         end
 
         for _, o in ipairs(ac[n]) do
             uc(o, co)
+        end
+        return
+    elseif n:lower() == "newaura" then
+        if not na then
+            lna()
+            local t = 0
+            while not na and t < 5 do
+                task.wait(0.5)
+                t = t + 0.5
+            end
+        end
+        if not na then return end
+        
+        for _, d in ipairs(na:GetDescendants()) do
+            if d:IsA("Attachment") then
+                local p = gp(c, "Torso")
+                if d.Parent:IsA("BasePart") then
+                    p = gp(c, d.Parent.Name) or p
+                end
+                p = p or h
+                
+                if p then
+                    local an = d.Name .. "_" .. n .. "_Custom"
+                    local at = p:FindFirstChild(an) or Instance.new("Attachment")
+                    at.Name = an
+                    at.CFrame = d.CFrame
+                    at.Parent = p
+                    
+                    table.insert(ac[n], at)
+                    
+                    for _, ef in ipairs(d:GetChildren()) do
+                        if ef:IsA("ParticleEmitter") or ef:IsA("Beam") or ef:IsA("Trail") or ef:IsA("Light") or ef:IsA("Fire") or ef:IsA("Smoke") or ef:IsA("Sparkles") then
+                            local cl = ef:Clone()
+                            if cl:IsA("ParticleEmitter") then
+                                cl.Enabled = true
+                            end
+                            cl.Parent = at
+                        end
+                    end
+                    uc(at, co)
+                end
+            end
         end
         return
     end
