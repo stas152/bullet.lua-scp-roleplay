@@ -8,28 +8,34 @@ local ac = {}
 local co = Color3.fromRGB(96, 205, 255)
 
 local cm = nil
+local na = nil
 
-local function lc()
-    local u = "https://raw.githubusercontent.com/stas152/bullet.lua-scp-roleplay/main/CosmicAura.txt.rbxmx"
-    local f = "CosmicAura.rbxmx"
-    
+local function lf(u, f, cb)
     if not isfile(f) then
         pcall(function()
             writefile(f, game:HttpGet(u))
         end)
     end
-
     if isfile(f) then
         local s, r = pcall(function()
             return game:GetObjects(getcustomasset(f))[1]
         end)
         if s and r then
-            cm = r
+            cb(r)
         end
     end
 end
 
+local function lc()
+    lf("https://raw.githubusercontent.com/stas152/bullet.lua-scp-roleplay/main/CosmicAura.txt.rbxmx", "CosmicAura.rbxmx", function(r) cm = r end)
+end
+
+local function lna()
+    lf("https://raw.githubusercontent.com/stas152/bullet.lua-scp-roleplay/main/aura900.rbxm", "aura900.rbxm", function(r) na = r end)
+end
+
 task.spawn(lc)
+task.spawn(lna)
 
 local function gm(id)
     local ok, res = pcall(game.GetObjects, game, "rbxassetid://" .. id)
@@ -104,6 +110,9 @@ local function eq(n)
     un(n)
     ac[n] = {}
     
+    local custom = false
+    local target = nil
+    
     if n:lower() == "cosmic" then
         if not cm then
             lc()
@@ -113,8 +122,23 @@ local function eq(n)
                 t = t + 0.5
             end
         end
-        
-        if not cm then return end
+        target = cm
+        custom = true
+    elseif n:lower() == "newaura" then
+        if not na then
+            lna()
+            local t = 0
+            while not na and t < 5 do
+                task.wait(0.5)
+                t = t + 0.5
+            end
+        end
+        target = na
+        custom = true
+    end
+    
+    if custom then
+        if not target then return end
         
         local function s(o)
             local cl = o:Clone()
@@ -145,12 +169,12 @@ local function eq(n)
             end
         end
         
-        if cm:IsA("Model") or cm:IsA("Folder") then
-            for _, ch in ipairs(cm:GetChildren()) do
+        if target:IsA("Model") or target:IsA("Folder") then
+            for _, ch in ipairs(target:GetChildren()) do
                 s(ch)
             end
         else
-            s(cm)
+            s(target)
         end
 
         for _, o in ipairs(ac[n]) do
@@ -228,10 +252,17 @@ task.spawn(function()
         task.wait(1)
         f = gf()
     end
-    if f and not f:FindFirstChild("Cosmic") then
-        local d = Instance.new("Folder")
-        d.Name = "Cosmic"
-        d.Parent = f
+    if f then
+        if not f:FindFirstChild("Cosmic") then
+            local d = Instance.new("Folder")
+            d.Name = "Cosmic"
+            d.Parent = f
+        end
+        if not f:FindFirstChild("newaura") then
+            local d = Instance.new("Folder")
+            d.Name = "newaura"
+            d.Parent = f
+        end
     end
 end)
 
