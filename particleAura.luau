@@ -31,14 +31,7 @@ local function lc()
 end
 
 local function lna()
-    lf("https://raw.githubusercontent.com/stas152/bullet.lua-scp-roleplay/main/aura900.rbxm", "aura900.rbxm", function(r) 
-        na = r 
-        for _, o in ipairs(na:GetDescendants()) do
-            if o.Name:lower():find("glare") and (o:IsA("ParticleEmitter") or o:IsA("Beam") or o:IsA("Trail") or o:IsA("Light") or o:IsA("Fire") or o:IsA("Smoke") or o:IsA("Sparkles")) then
-                o:Destroy()
-            end
-        end
-    end)
+    lf("https://raw.githubusercontent.com/stas152/bullet.lua-scp-roleplay/main/aura900.rbxm", "aura900.rbxm", function(r) na = r end)
 end
 
 task.spawn(lc)
