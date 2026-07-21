@@ -42,12 +42,6 @@ local function gm(id)
     if ok and res and res[1] then
         local m = res[1]
         m.Parent = ws
-        local far = Vector3.new(999999, 999999, 999999)
-        if m:IsA("Model") then
-            m:MoveTo(far)
-        elseif m:IsA("BasePart") then
-            m.Position = far
-        end
         return m
     end
 end
@@ -78,13 +72,23 @@ local function gp(c, n)
     return c:FindFirstChild(n)
 end
 
+local function tc(e, c)
+    if e:IsA("ParticleEmitter") or e:IsA("Beam") or e:IsA("Trail") then
+        e.Color = ColorSequence.new(c)
+    elseif e:IsA("Light") or e:IsA("Fire") or e:IsA("Smoke") then
+        e.Color = c
+    elseif e:IsA("Sparkles") then
+        e.SparkleColor = c
+    elseif e:IsA("Highlight") then
+        e.FillColor = c
+        e.OutlineColor = c
+    end
+end
+
 local function uc(a, c)
-    for _, e in ipairs(a:GetChildren()) do
-        if e:IsA("ParticleEmitter") or e:IsA("Beam") or e:IsA("Trail") then
-            e.Color = ColorSequence.new(c)
-        elseif e:IsA("Light") then
-            e.Color = c
-        end
+    tc(a, c)
+    for _, e in ipairs(a:GetDescendants()) do
+        tc(e, c)
     end
 end
 
@@ -178,13 +182,7 @@ local function eq(n)
         end
 
         for _, o in ipairs(ac[n]) do
-            if o:IsA("Attachment") or o:IsA("BasePart") then
-                uc(o, co)
-            elseif o:IsA("ParticleEmitter") or o:IsA("Beam") or o:IsA("Trail") then
-                o.Color = ColorSequence.new(co)
-            elseif o:IsA("Light") then
-                o.Color = co
-            end
+            uc(o, co)
         end
         return
     end
@@ -233,13 +231,7 @@ local function sc(nc)
     co = nc
     for _, as in pairs(ac) do
         for _, at in ipairs(as) do
-            if at:IsA("Attachment") or at:IsA("BasePart") then
-                uc(at, co)
-            elseif at:IsA("ParticleEmitter") or at:IsA("Beam") or at:IsA("Trail") then
-                at.Color = ColorSequence.new(co)
-            elseif at:IsA("Light") then
-                at.Color = co
-            end
+            uc(at, co)
         end
     end
 end
